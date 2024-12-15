@@ -4,15 +4,16 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    _ = b.addModule("fusion", .{
+    const fusion = b.addModule("fusion", .{
         .root_source_file = b.path("src/root.zig"),
 
-        // .link_libc = true,
-        // .link_libcpp = true,
+        .link_libc = true,
+        .link_libcpp = true,
 
         .target = target,
         .optimize = optimize,
     });
+    fusion.linkSystemLibrary("crossterm_ffi", .{ .needed = true });
 
     const tests = b.addTest(.{
         .root_source_file = b.path("src/root.zig"),
@@ -20,8 +21,9 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    // tests.linkLibC();
-    // tests.linkLibCpp();
+    tests.linkLibC();
+    tests.linkLibCpp();
+    tests.linkSystemLibrary("crossterm_ffi");
 
     b.installArtifact(tests);
 
